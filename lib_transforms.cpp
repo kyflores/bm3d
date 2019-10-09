@@ -19,6 +19,7 @@
  **/
 
 #include "lib_transforms.h"
+#include "FFHT/fht.h"
 #include <math.h>
 
 #include <numeric>
@@ -372,6 +373,7 @@ void hadamard_transform(
 ,   const unsigned N
 ,   const unsigned D
 ){
+    /*
     if (N == 1)
         return;
     else if (N == 2)
@@ -397,6 +399,8 @@ void hadamard_transform(
         hadamard_transform(vec, tmp, n, D);
         hadamard_transform(vec, tmp, n, D + n);
     }
+    */
+    fht_float(&vec[D], log2(N));
 }
 
 /**
