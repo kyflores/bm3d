@@ -6,6 +6,8 @@ find_package (JPEG REQUIRED)
 find_package (PNG REQUIRED)
 find_package (OpenMP)
 
+option(USE_OPENMP "Support OpenMP" ON)
+
 set (APP_SOURCES
     ${CMAKE_SOURCE_DIR}/bm3d.cpp
     ${CMAKE_SOURCE_DIR}/iio.c
@@ -49,9 +51,11 @@ target_compile_options(bm3d PRIVATE
     "-g"
 )
 if(OPENMP_FOUND)
-    target_compile_options(bm3d PRIVATE
-        ${OpenMP_CXX_FLAGS}
-    )
+    if (USE_OPENMP)
+        target_compile_options(bm3d PRIVATE
+            ${OpenMP_CXX_FLAGS}
+        )
+    endif()
 endif()
 
 target_link_libraries(bm3d PRIVATE
