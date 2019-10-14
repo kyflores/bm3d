@@ -29,7 +29,8 @@ int run_bm3d(
 ,   const unsigned tau_2D_wien
 ,   const unsigned color_space
 ,   const unsigned patch_size = 0
-,   const unsigned num_threads = 0
+,   const unsigned divide_num = 0
+,   const unsigned active_cores = 0
 ,   const bool verbose = false
 );
 

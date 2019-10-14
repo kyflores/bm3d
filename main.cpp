@@ -52,7 +52,8 @@ int main(int argc, char **argv)
   const char *_tau_2D_wien = pick_option(&argc, argv, "tau_2d_wien", "dct");
   const char *_color_space = pick_option(&argc, argv, "color_space", "opp");
   const char *_patch_size = pick_option(&argc, argv, "patch_size", "0"); // >0: overrides default
-  const char *_nb_threads = pick_option(&argc, argv, "nb_threads", "0");
+  const char *_divide_num = pick_option(&argc, argv, "divide_num", "0");
+  const char *_active_cores = pick_option(&argc, argv, "active_cores", "1");
   const bool useSD_1 = pick_option(&argc, argv, "useSD_hard", NULL) != NULL;
   const bool useSD_2 = pick_option(&argc, argv, "useSD_wien", NULL) != NULL;
   const bool verbose = pick_option(&argc, argv, "verbose", NULL) != NULL;
@@ -87,13 +88,21 @@ int main(int argc, char **argv)
     } else {
       const unsigned patch_size = (unsigned) patch_size;
     }
-  const int nb_threads = atoi(_nb_threads);
-    if (nb_threads < 0)
+  const int divide_num = atoi(_divide_num);
+    if (divide_num < 0)
     {
-      cout << "The nb_threads parameter must not be negative." << endl;
+      cout << "The divide_num parameter must not be negative." << endl;
       return EXIT_FAILURE;
     } else {
-      const unsigned nb_threads = (unsigned) nb_threads;
+      const unsigned divide_num = (unsigned) divide_num;
+    }
+  const int active_cores = atoi(_active_cores);
+    if (active_cores < 0)
+    {
+      cout << "Core number must not be negative." << endl;
+      return EXIT_FAILURE;
+    } else {
+      const unsigned active_cores = (unsigned) active_cores;
     }
 
   //! Check if there is the right call for the algorithm
@@ -105,7 +114,8 @@ int main(int argc, char **argv)
              [-useSD_wien]\n\
              [-color_space {rgb,yuv,opp,ycbcr} (default: opp)]\n\
              [-patch_size {0,8,...} (default: 0, auto size, 8 or 12 depending on sigma)]\n\
-             [-nb_threads (default: 0, auto number)]\n\
+             [-divide_num (default: 0, auto number)]\n\
+             [-active_cores (default: 1, auto number)]\n\
              [-verbose]" << endl;
     return EXIT_FAILURE;
   }
@@ -123,7 +133,7 @@ int main(int argc, char **argv)
    //! Denoising
    if (run_bm3d(fSigma, img_noisy, img_basic, img_denoised, width, height, chnls,
                  useSD_1, useSD_2, tau_2D_hard, tau_2D_wien, color_space, patch_size,
-                 nb_threads, verbose)
+                 divide_num, active_cores, verbose)
         != EXIT_SUCCESS)
         return EXIT_FAILURE;
 
