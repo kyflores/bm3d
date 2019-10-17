@@ -160,6 +160,9 @@ int run_bm3d(
     // improved very little by allowing logical threads to run
     if (active_cores == 0) {
         omp_set_num_threads(omp_get_num_procs());
+    } else if (active_cores > omp_get_num_procs()) {
+        cout << "Active cores is more than cores available, so it was set to the max allowed." << endl;
+        omp_set_num_threads(omp_get_num_procs());
     } else {
         omp_set_num_threads(active_cores);
     }
