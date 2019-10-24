@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.14)
+cmake_minimum_required(VERSION 3.10)
 project(da3d)
 
 find_package (TIFF REQUIRED)
@@ -30,13 +30,10 @@ set (LIB_INCLUDES
 add_subdirectory(FFHT)
 
 # Main Application Target
-add_executable(bm3d)
+add_executable(bm3d ${APP_SOURCES})
 target_include_directories(bm3d PRIVATE
     ${APP_INCLUDES}
     ${LIB_INCLUDES}
-)
-target_sources(bm3d PRIVATE
-    ${APP_SOURCES}
 )
 target_link_libraries(bm3d PRIVATE
     ${TIFF_LIBRARIES}
@@ -60,4 +57,9 @@ endif()
 
 target_link_libraries(bm3d PRIVATE
     ffht
+)
+
+install(
+    TARGETS bm3d
+    DESTINATION ${CMAKE_INSTALL_PREFIX}/bin/
 )
