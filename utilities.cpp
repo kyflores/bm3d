@@ -25,6 +25,11 @@
 #include <math.h>
 
 #include "utilities.h"
+#define cimg_display 0
+#define cimg_use_png 1
+#define cimg_use_jpeg 1
+#define cimg_use_tiff 1
+#include "CImg.h"
 extern "C"{
 #include "iio.h"
 }
@@ -34,7 +39,8 @@ extern "C"{
 #define OPP       2
 #define RGB       3
 
- using namespace std;
+using namespace std;
+namespace cimg = cimg_library;
 
  /**
   * @brief Load image, check the number of channels
@@ -53,42 +59,37 @@ int load_image(
 ,   unsigned * chnls
 ){
     //! read input image
-	cout << endl << "Read input image...";
-	size_t h, w, c;
-	float *tmp = NULL;
-   int ih, iw, ic;
+    cout << endl << "Read input image...";
+    size_t h, w, c;
 
-   tmp = iio_read_image_float_split(name, &iw, &ih, &ic);
-   w=iw; h=ih; c=ic;
-	if (!tmp)
-	{
-		cout << "error :: " << name << " not found or not a correct image" << endl;
-		return EXIT_FAILURE;
-	}
-	cout << "done." << endl;
+    const cimg::CImg<float> src(name);
+    w = src.width();
+    h = src.height();
+    c = src.spectrum();
+    cout << "done." << endl;
 
-	//! test if image is really a color image and exclude the alpha channel
-	if (c > 2)
-	{
-	    unsigned k = 0;
-	    while (k < w * h && tmp[k] == tmp[w * h + k] && tmp[k] == tmp[2 * w * h + k])
+    //! test if image is really a color image and exclude the alpha channel
+    if (c > 2)
+    {
+        unsigned k = 0;
+        while (k < w * h && src.at(k) == src.at(w * h + k) && src.at(k) == src.at(2 * w * h + k))
             k++;
         c = (k == w * h ? 1 : 3);
-	}
+    }
 
-	//! Some image informations
-	cout << "image size :" << endl;
-	cout << " - width          = " << w << endl;
-	cout << " - height         = " << h << endl;
-	cout << " - nb of channels = " << c << endl;
+    //! Some image informations
+    cout << "image size :" << endl;
+    cout << " - width          = " << w << endl;
+    cout << " - height         = " << h << endl;
+    cout << " - nb of channels = " << c << endl;
 
-	//! Initializations
-	*width  = w;
-	*height = h;
-	*chnls  = c;
-	img.resize(w * h * c);
-	for (unsigned k = 0; k < w * h * c; k++)
-        img[k] = tmp[k];
+    //! Initializations
+    *width  = w;
+    *height = h;
+    *chnls  = c;
+    img.resize(w * h * c);
+    for (unsigned k = 0; k < w * h * c; k++)
+        img[k] = src.at(k);
 
     return EXIT_SUCCESS;
 }
@@ -109,18 +110,8 @@ int save_image(
 ,   const unsigned height
 ,   const unsigned chnls
 ){
-    //! Allocate Memory
-    float* tmp = new float[width * height * chnls];
-
-    //! Check for boundary problems
-    for (unsigned k = 0; k < width * height * chnls; k++)
-        tmp[k] = img[k]; //(img[k] > 255.0f ? 255.0f : (img[k] < 0.0f ? 0.0f : img[k]));
-
-    iio_save_image_float_split(name, tmp, width, height, chnls);
-
-
-    //! Free Memory
-    delete[] tmp;
+    cimg::CImg<float> result(img.data(), width, height, 1, chnls);
+    result.save(name);
 
     return EXIT_SUCCESS;
 }
